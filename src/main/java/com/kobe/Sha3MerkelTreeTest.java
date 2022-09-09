@@ -7,9 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Sha3MerkelTreeTest {
-
     public static void main(String[] args) {
-
         List<String> tempTxList = new ArrayList<String>();
         tempTxList.add("0x617E266FFA5c2B168fB6B6cE1Bee9CA2E461DD58");
         tempTxList.add("0x617E266FFA5c2B168fB6B6cE1Bee9CA2E461DD57");
