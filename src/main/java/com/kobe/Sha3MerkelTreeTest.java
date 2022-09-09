@@ -35,7 +35,7 @@ public class Sha3MerkelTreeTest {
         }
         Sha3MerkelTree merkleTrees = new Sha3MerkelTree(leaves, true);
         System.out.println("ROOT:  " + merkleTrees.getRoot());
-        tempTxList.add("0x34fDB4ec9543742ed3366BA99fE617f8db5a63B4");//不在的节点严重
+        tempTxList.add("0x34fDB4ec9543742ed3366BA99fE617f8db5a63B4");//不在的节点验证
         for (String data : tempTxList) {
             String leaf = merkleTrees.hash(data);
             List<String> proof = merkleTrees.getProof(leaf);
