@@ -153,7 +153,7 @@ public abstract class AbstractMerkelTree implements MerkelTree {
         assert !isEmpty(leaf) : "leaf required";
         assert !isEmpty(root) : "root required";
         assert proofs != null : "proofs required";
-        if (proofs.size() > leaves.size()) return false;
+        if (proofs.size() > nodePositionList.size()) return false;
         if (sort) {
             return verifyWithSorted(leaf, proofs, root);
         }
