@@ -10,7 +10,7 @@ public abstract class AbstractMerkelTree implements MerkelTree {
     private List<String> leaves;
 
 
-    private Map<String, String> nodePosition;
+    private List<Map<String, Integer>> nodePositionList;
 
     private boolean sort;
 
@@ -24,8 +24,10 @@ public abstract class AbstractMerkelTree implements MerkelTree {
         this.tree = new ArrayList<>();
         root = "";
         this.sort = sort;
+        nodePositionList = new ArrayList<>();
         initMerkleTree();
-        nodePosition = new HashMap<>();
+        int x = 1;
+
     }
 
 
@@ -69,8 +71,10 @@ public abstract class AbstractMerkelTree implements MerkelTree {
         tree.add(tempTxList);
         List<String> newTxList = new ArrayList<String>();
         int index = 0;
+        Map<String, Integer> position = new HashMap<>();
         while (index < tempTxList.size()) {
             String left = tempTxList.get(index); // left
+
             index++;
             String right = ""; // right
             if (index != tempTxList.size()) {
@@ -78,6 +82,7 @@ public abstract class AbstractMerkelTree implements MerkelTree {
             }
             if ("".equals(right)) {
                 newTxList.add(left);
+                position.put(left, 0);
             } else {
                 if (sort) {
                     if (left.compareTo(right) > 0) {
@@ -86,11 +91,14 @@ public abstract class AbstractMerkelTree implements MerkelTree {
                         right = temp;
                     }
                 }
+                position.put(left, 0);
+                position.put(right, 1);
                 String sha2HexValue = hash(left + right);
                 newTxList.add(sha2HexValue);
             }
             index++;
         }
+        nodePositionList.add(position);
         return newTxList;
     }
 
@@ -145,8 +153,11 @@ public abstract class AbstractMerkelTree implements MerkelTree {
         assert !isEmpty(leaf) : "leaf required";
         assert !isEmpty(root) : "root required";
         assert proofs != null : "proofs required";
-        if (sort) return verifyWithSorted(leaf, proofs, root);
-        return verifyWithSorted(leaf, proofs, root);
+        if (proofs.size() > leaves.size()) return false;
+        if (sort) {
+            return verifyWithSorted(leaf, proofs, root);
+        }
+        return verifyWithNoSorted(leaf, proofs, root);
     }
 
 
@@ -159,8 +170,18 @@ public abstract class AbstractMerkelTree implements MerkelTree {
      * @return
      */
     private boolean verifyWithNoSorted(String leaf, List<String> proofs, String root) {
-
-        return false;
+        int deepth = nodePositionList.size() - proofs.size();
+        String computedHash = leaf;
+        for (String proof : proofs) {
+            Integer position = nodePositionList.get(deepth++).getOrDefault(proof, -1);
+            if (position < 0) return false;
+            if (position == 0) {//左节点
+                computedHash = hash(proof + computedHash);
+            } else {//右节点
+                computedHash = hash(computedHash + proof);
+            }
+        }
+        return root.equals(computedHash);
     }
 
 
@@ -173,12 +194,12 @@ public abstract class AbstractMerkelTree implements MerkelTree {
      * @return
      */
     private boolean verifyWithSorted(String leaf, List<String> proofs, String root) {
-        String computedHash = "";
+        String computedHash = leaf;
         for (String proof : proofs) {
-            if (leaf.compareTo(proof) >= 0) {
-                computedHash = hash(proof + leaf);
+            if (computedHash.compareTo(proof) >= 0) {
+                computedHash = hash(proof + computedHash);
             } else {
-                computedHash = hash(leaf + proof);
+                computedHash = hash(computedHash + proof);
             }
         }
         return root.equals(computedHash);
