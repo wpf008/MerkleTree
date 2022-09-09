@@ -1,5 +1,8 @@
 package com.kobe;
 
+import org.bouncycastle.util.encoders.Hex;
+import org.web3j.crypto.Hash;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,12 +29,25 @@ public class Sha3MerkelTreeTest {
         tempTxList.add("0x46a3A41bd932244Dd08186e4c19F1a7E48cbcDf4");
         tempTxList.add("0x34fDB4ec9543742ed3366BA99fE617f8db5a63Be");
 
-        Sha3MerkelTree merkleTrees = new Sha3MerkelTree(tempTxList, true);
+        List<String> leaves = new ArrayList<>();
+        for (String s : tempTxList) {
+            leaves.add(hash(s));
+        }
+        Sha3MerkelTree merkleTrees = new Sha3MerkelTree(leaves, true);
         System.out.println("ROOT:  " + merkleTrees.getRoot());
         System.out.println("leaf:  " + merkleTrees.hash("0x617E266FFA5c2B168fB6B6cE1Bee9CA2E461DD50"));
         List<String> proof = merkleTrees.getProof(merkleTrees.hash("0x617E266FFA5c2B168fB6B6cE1Bee9CA2E461DD50"));
         System.out.println("proof:  " + proof);
 
 
+    }
+
+    public static String hash(String nodeVal) {
+        if (nodeVal.startsWith("0x")) {
+            nodeVal = nodeVal.substring(2);
+        }
+        byte[] decodeByte = Hex.decode(nodeVal);
+        byte[] reshash = Hash.sha3(decodeByte);
+        return new String(Hex.encode(reshash));
     }
 }
