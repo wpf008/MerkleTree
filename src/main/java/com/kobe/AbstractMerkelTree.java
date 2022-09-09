@@ -1,9 +1,6 @@
 package com.kobe;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 public abstract class AbstractMerkelTree implements MerkelTree {
 
@@ -12,7 +9,11 @@ public abstract class AbstractMerkelTree implements MerkelTree {
     private String root;
     private List<String> leaves;
 
+
+    private Map<String, String> nodePosition;
+
     private boolean sort;
+
 
     public AbstractMerkelTree(List<String> leaves) {
         this(leaves, false);
@@ -24,6 +25,7 @@ public abstract class AbstractMerkelTree implements MerkelTree {
         root = "";
         this.sort = sort;
         initMerkleTree();
+        nodePosition = new HashMap<>();
     }
 
 
@@ -132,5 +134,54 @@ public abstract class AbstractMerkelTree implements MerkelTree {
         }
     }
 
+
+    private boolean isEmpty(Object str) {
+        return (str == null || "".equals(str));
+    }
+
+
+    @Override
+    public boolean verify(String leaf, List<String> proofs, String root) {
+        assert !isEmpty(leaf) : "leaf required";
+        assert !isEmpty(root) : "root required";
+        assert proofs != null : "proofs required";
+        if (sort) return verifyWithSorted(leaf, proofs, root);
+        return verifyWithSorted(leaf, proofs, root);
+    }
+
+
+    /**
+     * Unsorted MerkelTree verify proofs
+     *
+     * @param leaf
+     * @param proofs
+     * @param root
+     * @return
+     */
+    private boolean verifyWithNoSorted(String leaf, List<String> proofs, String root) {
+
+        return false;
+    }
+
+
+    /**
+     * Sorted MerkelTree verify proofs
+     *
+     * @param leaf
+     * @param proofs
+     * @param root
+     * @return
+     */
+    private boolean verifyWithSorted(String leaf, List<String> proofs, String root) {
+        String computedHash = "";
+        for (String proof : proofs) {
+            if (leaf.compareTo(proof) >= 0) {
+                computedHash = hash(proof + leaf);
+            } else {
+                computedHash = hash(leaf + proof);
+            }
+        }
+        return root.equals(computedHash);
+    }
 
 }
