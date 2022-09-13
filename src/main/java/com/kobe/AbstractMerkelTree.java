@@ -26,7 +26,6 @@ public abstract class AbstractMerkelTree implements MerkelTree {
         this.sort = sort;
         nodePositionList = new ArrayList<>();
         initMerkleTree();
-        int x = 1;
 
     }
 
@@ -203,6 +202,29 @@ public abstract class AbstractMerkelTree implements MerkelTree {
             }
         }
         return root.equals(computedHash);
+    }
+
+
+    private int binarySearch(List<String> list, String val) {
+        //l-左边 r-右边 m-中间
+        int l = 0, r = list.size() - 1, m;
+        while (l <= r) {
+            //m = (l + r) / 2; //l+r结果数值过大会存在溢出
+            m = (l + r) >>> 1; //正数右移运算相当于除二
+            int compareTo = list.get(m).compareTo(val);
+            if (compareTo == 0) {
+                return m;
+            } else if (compareTo > 0) {
+                r = m - 1;
+            } else {
+                l = m + 1;
+            }
+        }
+        return -1;
+    }
+
+    public List<String> getNode(int index) {
+        return tree.get(index);
     }
 
 }
