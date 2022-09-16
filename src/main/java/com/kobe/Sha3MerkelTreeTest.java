@@ -10,7 +10,7 @@ public class Sha3MerkelTreeTest {
         List<String> tempTxList = new ArrayList<String>();
         String s1 = "123456789abcedfABCEDE";
         Random random = new Random();
-        for (int i = 0; i < 1000000; i++) {
+        for (int i = 0; i < 10000000; i++) {
             StringBuffer sb = new StringBuffer();
             sb.append("0x");
             for (int j = 0; j < 42; j++)
@@ -44,16 +44,20 @@ public class Sha3MerkelTreeTest {
         long end = System.currentTimeMillis();
         System.out.println("叶子节点个数为： " + tempTxList.size() + " ,merkleTree构建时间：" + (end - start) + "ms");
         System.out.println("ROOT:  " + merkleTrees.getRoot());
-        tempTxList.add("0x34fDB4ec9543742ed3366BA99fE617f8db5a63B4");//不在的节点验证
-        start = System.currentTimeMillis();
+//        merkleTrees.printTree();
+//        tempTxList.add("0x34fDB4ec9543742ed3366BA99fE617f8db5a63B4");//不在的节点验证
+        long startProof = System.currentTimeMillis();
         for (String data : tempTxList) {
             String leaf = merkleTrees.hash(data);
+//            start = System.currentTimeMillis();
             List<String> proof = merkleTrees.getProof(leaf);
-            boolean verify = merkleTrees.verify(leaf, proof, merkleTrees.getRoot());
-            System.out.println("data is : " + data + " proof is " + verify);
+//            end = System.currentTimeMillis();
+//            boolean verify = merkleTrees.verify(leaf, proof, merkleTrees.getRoot());
+//            boolean verify =true;
+//            System.out.println("data is : " + data + " proof is " + verify + " 执行时间：" + (end - start) + " ms");
         }
-        end = System.currentTimeMillis();
-        System.out.println("叶子节点个数为： " + tempTxList.size() + "整个节点获取proof时间:" + (end - start) + "ms");
+        long endProof = System.currentTimeMillis();
+        System.out.println("叶子节点个数为： " + tempTxList.size() + "整个节点获取proof时间:" + (endProof - startProof) + " ms");
     }
 
     public static String hash(String nodeVal) {

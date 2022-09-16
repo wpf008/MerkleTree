@@ -61,7 +61,8 @@ public abstract class AbstractMerkelTree implements MerkelTree {
     @Override
     public List<String> getProof(String leaf) {
         List<String> proofList = new ArrayList<>();
-        getProof(leaf, 0, proofList);
+        getProof(leaf, proofList);//优化后的代码
+//        getProof(leaf, 0, proofList);//未优化的代码
         return proofList;
     }
 
@@ -99,6 +100,43 @@ public abstract class AbstractMerkelTree implements MerkelTree {
         }
         nodePositionList.add(position);
         return newTxList;
+    }
+
+
+    private void getProof(String leaf, List<String> proofList) {
+        List<String> nodes = tree.get(0);
+        int index = -1;
+        if (sort) {
+            index = binarySearch(nodes, leaf);//排序的用二分查找
+        } else {//未排序的，用普通查找
+            for (int i = 0; i < nodes.size(); i++) {
+                if (nodes.get(i).equals(leaf)) {
+                    index = i;
+                    break;
+                }
+            }
+        }
+        if (index < 0)
+            return;
+        String preHash = "";
+        for (int i = 0; i < tree.size() - 1; i++) {
+            if (index % 2 == 0) {
+                if (index + 1 < nodes.size()) {
+                    String right = nodes.get(index + 1);
+                    if (preHash.equals(right)) {
+                        continue;
+                    }
+                    proofList.add(right);
+                    preHash = right;
+                }
+            } else {
+                String left = nodes.get(index - 1);
+                proofList.add(left);
+                preHash = left;
+            }
+            index = index / 2;
+            nodes = tree.get(i + 1);
+        }
     }
 
     private void getProof(String leaf, int height, List<String> proofList) {
@@ -223,8 +261,11 @@ public abstract class AbstractMerkelTree implements MerkelTree {
         return -1;
     }
 
-    public List<String> getNode(int index) {
-        return tree.get(index);
+    public void printTree() {
+        for (List<String> list : tree) {
+            System.out.println(list);
+        }
     }
+
 
 }
